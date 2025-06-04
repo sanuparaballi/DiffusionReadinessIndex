@@ -11,6 +11,7 @@ import networkx as nx
 
 # --- Baseline Centrality Functions ---
 
+
 def get_degree_centrality(graph, per_node=False, node=None):
     """
     Calculates degree centrality for all nodes or a specific node.
@@ -36,9 +37,9 @@ def get_degree_centrality(graph, per_node=False, node=None):
         # For transmission readiness, out-degree centrality is often more indicative.
         # nx.out_degree_centrality(graph) directly gives this.
         centralities = nx.out_degree_centrality(graph)
-    else: # Undirected graph
+    else:  # Undirected graph
         centralities = nx.degree_centrality(graph)
-        
+
     if per_node:
         return centralities
     else:
@@ -68,10 +69,10 @@ def get_k_core_centrality(graph, per_node=False, node=None):
         # k-core is typically defined for undirected graphs.
         # We can use the undirected version or specific DiGraph core definitions if available/needed.
         # For simplicity and common usage, using the undirected version.
-        core_numbers = nx.core_number(nx.Graph(graph)) # Use undirected copy
+        core_numbers = nx.core_number(nx.Graph(graph))  # Use undirected copy
     else:
         core_numbers = nx.core_number(graph)
-        
+
     if per_node:
         return core_numbers
     else:
@@ -106,8 +107,8 @@ def get_eigenvector_centrality(graph, per_node=False, node=None, max_iter=100, t
         # For a more "spreading" focused version, one might use G.reverse().eigenvector_centrality()
         # or apply to an undirected version.
         # For now, standard NetworkX behavior:
-        centralities = nx.eigenvector_centrality_numpy(graph) # Uses numpy, generally preferred
-        # centralities = nx.eigenvector_centrality(graph, max_iter=max_iter, tol=tol) # Slower, pure Python
+        # centralities = nx.eigenvector_centrality_numpy(graph) # Uses numpy, generally preferred
+        centralities = nx.eigenvector_centrality(graph, max_iter=max_iter, tol=tol)  # Slower, pure Python
     except nx.NetworkXError as e:
         print(f"Eigenvector centrality computation failed: {e}. Returning empty dict or None.")
         # This can happen for graphs with no edges or certain structures.
@@ -174,52 +175,77 @@ def get_closeness_centrality(graph, per_node=False, node=None):
             raise ValueError("Node must be specified if per_node is False.")
         return centralities.get(node)
 
+
 # --- Main execution block (for testing this module independently) ---
-if __name__ == '__main__':
+if __name__ == "__main__":
     print("Testing baselines.py...")
 
     # Create a sample graph for testing
     G_test_undirected = nx.Graph()
-    G_test_undirected.add_edges_from([(1, 2), (1, 3), (2, 3), (2, 4), (3, 5), (4, 5), (4, 6), (5, 6), (6, 7)])
+    G_test_undirected.add_edges_from(
+        [(1, 2), (1, 3), (2, 3), (2, 4), (3, 5), (4, 5), (4, 6), (5, 6), (6, 7)]
+    )
     #  1 -- 2 -- 4 -- 6 -- 7
     #  |  / |    |  /
     #  3 -- 5 -- +
     nodes_list = list(G_test_undirected.nodes())
-    test_node = nodes_list[0] if nodes_list else 1 # Pick a node for single node tests
+    test_node = nodes_list[0] if nodes_list else 1  # Pick a node for single node tests
 
-    print(f"\n--- Testing on Undirected Graph ({G_test_undirected.number_of_nodes()} nodes, {G_test_undirected.number_of_edges()} edges) ---")
+    print(
+        f"\n--- Testing on Undirected Graph ({G_test_undirected.number_of_nodes()} nodes, {G_test_undirected.number_of_edges()} edges) ---"
+    )
     print(f"Degree Centrality (all): {get_degree_centrality(G_test_undirected, per_node=True)}")
-    print(f"Degree Centrality (node {test_node}): {get_degree_centrality(G_test_undirected, node=test_node)}")
-    
+    print(
+        f"Degree Centrality (node {test_node}): {get_degree_centrality(G_test_undirected, node=test_node)}"
+    )
+
     print(f"K-Core Centrality (all): {get_k_core_centrality(G_test_undirected, per_node=True)}")
-    print(f"K-Core Centrality (node {test_node}): {get_k_core_centrality(G_test_undirected, node=test_node)}")
+    print(
+        f"K-Core Centrality (node {test_node}): {get_k_core_centrality(G_test_undirected, node=test_node)}"
+    )
 
     print(f"Eigenvector Centrality (all): {get_eigenvector_centrality(G_test_undirected, per_node=True)}")
-    print(f"Eigenvector Centrality (node {test_node}): {get_eigenvector_centrality(G_test_undirected, node=test_node)}")
+    print(
+        f"Eigenvector Centrality (node {test_node}): {get_eigenvector_centrality(G_test_undirected, node=test_node)}"
+    )
 
     print(f"Betweenness Centrality (all): {get_betweenness_centrality(G_test_undirected, per_node=True)}")
-    print(f"Betweenness Centrality (node {test_node}): {get_betweenness_centrality(G_test_undirected, node=test_node)}")
-    
+    print(
+        f"Betweenness Centrality (node {test_node}): {get_betweenness_centrality(G_test_undirected, node=test_node)}"
+    )
+
     print(f"Closeness Centrality (all): {get_closeness_centrality(G_test_undirected, per_node=True)}")
-    print(f"Closeness Centrality (node {test_node}): {get_closeness_centrality(G_test_undirected, node=test_node)}")
+    print(
+        f"Closeness Centrality (node {test_node}): {get_closeness_centrality(G_test_undirected, node=test_node)}"
+    )
 
     # Create a sample directed graph
     DG_test = nx.DiGraph()
-    DG_test.add_edges_from([(1,2), (1,3), (2,3), (3,4), (4,1)]) # A cycle to ensure strong connectivity for eigenvector
+    DG_test.add_edges_from(
+        [(1, 2), (1, 3), (2, 3), (3, 4), (4, 1)]
+    )  # A cycle to ensure strong connectivity for eigenvector
     dg_nodes_list = list(DG_test.nodes())
     test_node_dg = dg_nodes_list[0] if dg_nodes_list else 1
 
-    print(f"\n--- Testing on Directed Graph ({DG_test.number_of_nodes()} nodes, {DG_test.number_of_edges()} edges) ---")
+    print(
+        f"\n--- Testing on Directed Graph ({DG_test.number_of_nodes()} nodes, {DG_test.number_of_edges()} edges) ---"
+    )
     print(f"Out-Degree Centrality (all): {get_degree_centrality(DG_test, per_node=True)}")
-    print(f"Out-Degree Centrality (node {test_node_dg}): {get_degree_centrality(DG_test, node=test_node_dg)}")
+    print(
+        f"Out-Degree Centrality (node {test_node_dg}): {get_degree_centrality(DG_test, node=test_node_dg)}"
+    )
 
     print(f"K-Core Centrality (all, from undirected view): {get_k_core_centrality(DG_test, per_node=True)}")
-    print(f"K-Core Centrality (node {test_node_dg}, from undirected view): {get_k_core_centrality(DG_test, node=test_node_dg)}")
+    print(
+        f"K-Core Centrality (node {test_node_dg}, from undirected view): {get_k_core_centrality(DG_test, node=test_node_dg)}"
+    )
 
     print(f"Eigenvector Centrality (all): {get_eigenvector_centrality(DG_test, per_node=True)}")
-    print(f"Eigenvector Centrality (node {test_node_dg}): {get_eigenvector_centrality(DG_test, node=test_node_dg)}")
+    print(
+        f"Eigenvector Centrality (node {test_node_dg}): {get_eigenvector_centrality(DG_test, node=test_node_dg)}"
+    )
 
     print(f"Betweenness Centrality (all): {get_betweenness_centrality(DG_test, per_node=True)}")
     print(f"Closeness Centrality (all): {get_closeness_centrality(DG_test, per_node=True)}")
-    
+
     print("\n--- Baselines Test Complete ---")

@@ -1,0 +1,12 @@
+/.spyproject/config/backups
+/.spyproject/config/defaults
+/.spyproject/config
+/DRI Formulation /data_loader/__pycache__
+/DRI Formulation /diffusion_models/__pycache__
+/DRI Formulation /etm_calculator/__pycache__
+/DRI Formulation /evaluation/__pycache__
+/DRI Formulation /graph_utils/__pycache__
+/DRI Formulation /results
+/DRI Formulation /structural_indices/__pycache__
+DRI Formulation /.DS_Store
+DRI Formulation /data_loader/.DS_Store
