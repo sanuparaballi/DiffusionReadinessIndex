@@ -1,6 +1,8 @@
 # diffusion_readiness_project/main.py
 # Python 3.9
 
+# author - Sanup Araballi
+
 """
 Main script to orchestrate the Diffusion Readiness Index research experiments.
 Workflow:
