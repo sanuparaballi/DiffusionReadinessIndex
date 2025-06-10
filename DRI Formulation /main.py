@@ -57,7 +57,7 @@ from evaluation import plotter
 
 # --- Configuration Loading (Example) ---
 DEFAULT_CONFIG = {
-    "dataset_type": "casflow",  # "casflow" or "snap_twitter"
+    "dataset_type": "snap_twitter",  # "casflow" or "snap_twitter"
     "casflow_data_path": "data_loader/dataset.txt",  # Relative to project root or an absolute path
     "snap_twitter_data_path": "data_loader/78813.txt",
     "results_dir": "results",
