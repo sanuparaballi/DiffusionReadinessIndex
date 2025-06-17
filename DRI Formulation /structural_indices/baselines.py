@@ -8,6 +8,7 @@ Diffusion Readiness Index (DRI).
 """
 
 import networkx as nx
+from scipy.sparse.linalg import ArpackNoConvergence  # Import the specific error
 
 # --- Baseline Centrality Functions ---
 
@@ -70,7 +71,8 @@ def get_k_core_centrality(graph, per_node=False, node=None):
 
 def get_eigenvector_centrality(graph, per_node=False, node=None, max_iter=1000, tol=1.0e-6):
     """
-    Calculates eigenvector centrality.
+    Calculates eigenvector centrality. Includes robust error handling
+    for non-convergence on certain graph structures.
 
     Args:
         graph (nx.Graph or nx.DiGraph): The input graph.
@@ -85,10 +87,13 @@ def get_eigenvector_centrality(graph, per_node=False, node=None, max_iter=1000, 
     try:
         # eigenvector_centrality_numpy is generally faster and more robust.
         centralities = nx.eigenvector_centrality_numpy(graph)
-    except (nx.NetworkXError, nx.NetworkXPointlessConcept) as e:
-        # Fallback for graphs where it's not well-defined (e.g., empty graph)
-        # or if the algorithm fails to converge.
-        print(f"Eigenvector centrality computation failed: {e}. Returning zeros.")
+    except (nx.NetworkXError, nx.NetworkXPointlessConcept, ArpackNoConvergence) as e:
+        # ADDED ArpackNoConvergence to the exception handling
+        # This occurs on graphs (especially directed ones) that are not strongly connected.
+        # We handle it by returning a default value of 0 for all nodes.
+        print(
+            f"  Warning: Eigenvector centrality computation failed with '{type(e).__name__}'. This is expected for non-strongly-connected directed graphs. Returning zeros."
+        )
         centralities = {n: 0.0 for n in graph.nodes()}
 
     if per_node:

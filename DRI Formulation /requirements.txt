@@ -15,6 +15,9 @@ torch>=1.12.0 # Check official PyTorch site for best M2 compatible version
 matplotlib>=3.4.0
 seaborn>=0.11.0
 
+# Utility for progress bars
+tqdm>=4.62.0
+
 # Optional: For more complex spectral analysis or machine learning components later
 # scikit-learn>=1.0.0
 # For GNNs (if we go that route, would require PyTorch or TensorFlow)
