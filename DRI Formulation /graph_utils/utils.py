@@ -1,3 +1,12 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Jun 16 20:39:08 2025
+
+@author: sanup
+"""
+
+
 # diffusion_readiness_project/graph_utils/utils.py
 # Python 3.9
 
@@ -10,9 +19,10 @@ These functions can be used by various modules for tasks like:
 """
 
 import networkx as nx
-from collections import deque # For BFS in k-hop neighborhood
+from collections import deque
 
 # --- Graph Utility Functions ---
+
 
 def get_k_hop_neighborhood_subgraph(graph, center_node, k, include_center=True):
     """
@@ -34,48 +44,38 @@ def get_k_hop_neighborhood_subgraph(graph, center_node, k, include_center=True):
                                 (Graph or DiGraph) matches the input graph type.
     """
     if center_node not in graph:
-        # print(f"Warning: Center node {center_node} not found in graph.")
-        if isinstance(graph, nx.DiGraph):
-            return nx.DiGraph()
-        else:
-            return nx.Graph()
+        # Create an empty graph of the same type as the input
+        return type(graph)()
 
     if k < 0:
-        # print("Warning: k (hops) cannot be negative. Returning empty graph.")
-        if isinstance(graph, nx.DiGraph):
-            return nx.DiGraph()
-        else:
-            return nx.Graph()
+        return type(graph)()
 
     # Use Breadth-First Search (BFS) to find nodes within k hops
     nodes_in_k_hop = {center_node}
-    queue = deque([(center_node, 0)]) # (node, current_depth)
+    queue = deque([(center_node, 0)])  # (node, current_depth)
     visited = {center_node}
 
     while queue:
         current_node, depth = queue.popleft()
 
         if depth < k:
-            for neighbor in graph.neighbors(current_node):
+            # For directed graphs, successors are 'out-neighbors'
+            # For undirected, neighbors() is equivalent
+            neighbors_to_explore = (
+                graph.successors(current_node) if graph.is_directed() else graph.neighbors(current_node)
+            )
+            for neighbor in neighbors_to_explore:
                 if neighbor not in visited:
                     visited.add(neighbor)
                     nodes_in_k_hop.add(neighbor)
                     queue.append((neighbor, depth + 1))
-    
-    if not include_center and k > 0 : # if k=0 and not include_center, it should be empty
-        nodes_in_k_hop.discard(center_node)
-    elif not include_center and k == 0:
-         nodes_in_k_hop = set()
 
+    if not include_center:
+        nodes_in_k_hop.discard(center_node)
 
     # Create the induced subgraph from the collected nodes
     # This automatically includes all edges between these nodes that exist in the original graph.
-    if isinstance(graph, nx.DiGraph):
-        subgraph = graph.subgraph(nodes_in_k_hop).copy() # Use .copy() to make it mutable if needed later
-    else:
-        subgraph = graph.subgraph(nodes_in_k_hop).copy()
-        
-    return subgraph
+    return graph.subgraph(nodes_in_k_hop).copy()
 
 
 def get_ego_network_minus_ego(graph, ego_node, radius=1):
@@ -93,104 +93,59 @@ def get_ego_network_minus_ego(graph, ego_node, radius=1):
                                 (within `radius` hops), excluding the ego_node itself.
                                 Returns an empty graph if ego_node is not in the graph.
     """
-    if ego_node not in graph:
-        # print(f"Warning: Ego node {ego_node} not found in graph.")
-        if isinstance(graph, nx.DiGraph):
-            return nx.DiGraph()
-        else:
-            return nx.Graph()
+    # This function is a convenient wrapper around get_k_hop_neighborhood_subgraph
+    return get_k_hop_neighborhood_subgraph(graph, ego_node, k=radius, include_center=False)
 
-    # nx.ego_graph includes the center node by default.
-    # We want the subgraph of its neighbors.
-    
-    # Get nodes in the k-hop neighborhood (excluding the center node itself)
-    # Using the k_hop function with include_center=False
-    neighborhood_nodes_subgraph = get_k_hop_neighborhood_subgraph(graph, ego_node, k=radius, include_center=False)
-    
-    return neighborhood_nodes_subgraph
-
-
-def get_graph_laplacian(graph, normalized=False):
-    """
-    Computes the Laplacian matrix of the graph.
-
-    Args:
-        graph (nx.Graph or nx.DiGraph): The input graph.
-                                       For DiGraph, it's typically the Laplacian of the
-                                       underlying undirected graph or a specific DiGraph Laplacian.
-                                       NetworkX `laplacian_matrix` uses the undirected version by default.
-        normalized (bool): If True, computes the normalized Laplacian. Otherwise,
-                           computes the combinatorial Laplacian.
-
-    Returns:
-        scipy.sparse.csr_matrix: The Laplacian matrix.
-    """
-    if normalized:
-        return nx.normalized_laplacian_matrix(graph)
-    else:
-        return nx.laplacian_matrix(graph)
-
-# Add other general graph utility functions as needed, for example:
-# - Function to get giant component
-# - Function to convert graph to specific formats if necessary for other libraries
-# - Functions to calculate specific types of paths or walks not readily in NetworkX
 
 # --- Main execution block (for testing this module independently) ---
-if __name__ == '__main__':
+if __name__ == "__main__":
     print("Testing graph_utils.py...")
 
     # Create a sample graph for testing
     G_test = nx.Graph()
     G_test.add_edges_from([(1, 2), (1, 3), (2, 3), (2, 4), (3, 5), (4, 5), (4, 6), (5, 6), (6, 7)])
-    # 1 -- 2 -- 4 -- 6 -- 7
-    # |  / |    |  /
-    # 3 -- 5 -- +
+    # Convert node IDs to string to match our parser's behavior
+    G_test_str = nx.relabel_nodes(G_test, str)
 
     print("\nOriginal Test Graph:")
-    print(f"Nodes: {G_test.nodes()}")
-    print(f"Edges: {G_test.edges()}")
+    print(f"Nodes: {G_test_str.nodes()}")
+    print(f"Edges: {G_test_str.edges()}")
 
     # Test get_k_hop_neighborhood_subgraph
-    center_node_test = 2
+    center_node_test = "2"
     k_hops_test = 1
-    k_hop_sub = get_k_hop_neighborhood_subgraph(G_test, center_node_test, k_hops_test)
+    k_hop_sub = get_k_hop_neighborhood_subgraph(G_test_str, center_node_test, k_hops_test)
     print(f"\n{k_hops_test}-hop neighborhood subgraph around node {center_node_test} (including center):")
-    print(f"Nodes: {k_hop_sub.nodes()}")
-    print(f"Edges: {k_hop_sub.edges()}")
-    
-    center_node_test = 6
-    k_hops_test = 2
-    k_hop_sub_2 = get_k_hop_neighborhood_subgraph(G_test, center_node_test, k_hops_test, include_center=True)
-    print(f"\n{k_hops_test}-hop neighborhood subgraph around node {center_node_test} (including center):")
-    print(f"Nodes: {k_hop_sub_2.nodes()}")
-    print(f"Edges: {k_hop_sub_2.edges()}")
+    print(f"Nodes: {sorted(list(k_hop_sub.nodes()))}")  # Expected: ['1', '2', '3', '4']
+    print(f"Edges: {list(k_hop_sub.edges())}")
+
+    center_node_test_2 = "6"
+    k_hops_test_2 = 2
+    k_hop_sub_2 = get_k_hop_neighborhood_subgraph(
+        G_test_str, center_node_test_2, k_hops_test_2, include_center=True
+    )
+    print(
+        f"\n{k_hops_test_2}-hop neighborhood subgraph around node {center_node_test_2} (including center):"
+    )
+    print(f"Nodes: {sorted(list(k_hop_sub_2.nodes()))}")  # Expected: ['2', '3', '4', '5', '6', '7']
+    print(f"Edges: {list(k_hop_sub_2.edges())}")
 
     # Test get_ego_network_minus_ego
-    ego_node_test = 4
+    ego_node_test = "4"
     radius_test = 1
-    ego_minus_sub = get_ego_network_minus_ego(G_test, ego_node_test, radius=radius_test)
+    ego_minus_sub = get_ego_network_minus_ego(G_test_str, ego_node_test, radius=radius_test)
     print(f"\nEgo network (radius {radius_test}) around node {ego_node_test} (excluding ego):")
-    print(f"Nodes: {ego_minus_sub.nodes()}") # Should be {2, 5, 6}
-    print(f"Edges: {ego_minus_sub.edges()}") # Should include (2,5) if it existed, (5,6)
-
-    # Test Laplacian
-    # Note: For this to run, you'd need scipy installed as nx.laplacian_matrix returns a scipy sparse matrix.
-    try:
-        laplacian = get_graph_laplacian(G_test)
-        print(f"\nLaplacian matrix (combinatorial) for G_test (shape: {laplacian.shape}):")
-        # print(laplacian.toarray()) # Can be large for big graphs
-    except Exception as e:
-        print(f"Could not compute Laplacian, ensure scipy is installed. Error: {e}")
+    print(f"Nodes: {sorted(list(ego_minus_sub.nodes()))}")  # Expected: ['2', '5', '6']
+    print(f"Edges: {list(ego_minus_sub.edges())}")  # Expected: [('5', '6')]
 
     # Test with a DiGraph
     DG_test = nx.DiGraph()
-    DG_test.add_edges_from([(1,2), (2,3), (1,3), (3,4)])
-    center_node_dg = 1
+    DG_test.add_edges_from([("1", "2"), ("2", "3"), ("1", "3"), ("3", "4")])
+    center_node_dg = "1"
     k_hops_dg = 1
     k_hop_sub_dg = get_k_hop_neighborhood_subgraph(DG_test, center_node_dg, k_hops_dg)
-    print(f"\n{k_hops_dg}-hop neighborhood DiGraph around node {center_node_dg} (including center):")
-    print(f"Nodes: {k_hop_sub_dg.nodes()}")
-    print(f"Edges: {k_hop_sub_dg.edges()}")
-
+    print(f"\n{k_hops_dg}-hop neighborhood DiGraph around node {center_node_dg} (successors):")
+    print(f"Nodes: {sorted(list(k_hop_sub_dg.nodes()))}")  # Expected: ['1', '2', '3']
+    print(f"Edges: {list(k_hop_sub_dg.edges())}")  # Expected: [('1','2'), ('1','3'), ('2','3')]
 
     print("\n--- Graph Utils Test Complete ---")

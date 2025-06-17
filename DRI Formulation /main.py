@@ -1,3 +1,12 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Jun 16 20:39:08 2025
+
+@author: sanup
+"""
+
+
 # diffusion_readiness_project/main.py
 # Python 3.9
 
