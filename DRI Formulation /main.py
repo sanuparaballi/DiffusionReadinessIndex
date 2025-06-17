@@ -53,7 +53,7 @@ from structural_indices import (
     literature_indices,
     composite_dri,
     mechanism_focused_dri,
-    spectral_tri,
+    spectral_dri,
 )
 from evaluation import metrics as eval_metrics
 from evaluation import plotter
@@ -108,7 +108,7 @@ DEFAULT_CONFIG = {
             ],
         },
     ],
-    "spectral_params": {"k_hop_local": 1, "ppr_alpha": 0.85, "heat_kernel_t": 0.1},
+    "spectral_params": {"k_hop_local": 1, "ppr_k_sum_hops": 1, "ppr_alpha": 0.85, "heat_kernel_t": 0.1},
     "evaluation_params": {"top_k_values_perc": [0.01, 0.05, 0.10]},
     "run_expensive_metrics": {  # Toggle for slow metrics like Betweenness/Gravity
         "betweenness": False,
@@ -211,7 +211,7 @@ def run_experiment(dataset_name, config):
     # Precompute global spectral info once if needed
     if config["dri_selection"]["spectral"]:
         print("  Precomputing global Fiedler info...")
-        spectral_tri.precompute_global_fiedler_info(graph)
+        spectral_dri.precompute_global_fiedler_info(graph)
 
     # Dynamically call DRI functions based on config
     dri_modules = {
@@ -219,7 +219,7 @@ def run_experiment(dataset_name, config):
         "literature_indices": literature_indices,
         "composite_dri": composite_dri,
         "mechanism_focused_dri": mechanism_focused_dri,
-        "spectral_tri": spectral_tri,
+        "spectral_dri": spectral_dri,
     }
 
     # Add more DRI functions to this map as they are implemented
@@ -233,16 +233,16 @@ def run_experiment(dataset_name, config):
         "FwLTR_struct": (literature_indices.get_fwltr_structural, {"uniform_threshold_fraction": 0.5}),
         "BPI-DRI": (mechanism_focused_dri.get_bpi_dri, {"normalize_components": True}),
         "LocFiedler (k=1)": (
-            spectral_tri.get_localized_fiedler_value,
+            spectral_dri.get_localized_fiedler_value,
             {"k_hop": config["spectral_params"]["k_hop_local"]},
         ),
-        "GlobFiedlerComp": (spectral_tri.get_node_global_fiedler_component, {}),
+        "GlobFiedlerComp": (spectral_dri.get_node_global_fiedler_component, {}),
         "LocSpecRadius (k=1)": (
-            spectral_tri.get_localized_spectral_radius,
+            spectral_dri.get_localized_spectral_radius,
             {"k_hop": config["spectral_params"]["k_hop_local"]},
         ),
         "PPR-API": (
-            spectral_tri.get_ppr_api_tri,
+            spectral_dri.get_ppr_api_dri,
             {
                 "k_sum_hops": config["spectral_params"]["ppr_k_sum_hops"],
                 "ppr_alpha": config["spectral_params"]["ppr_alpha"],
@@ -259,7 +259,7 @@ def run_experiment(dataset_name, config):
         DRI_FUNCTION_MAP["Gravity (r=3)"] = (literature_indices.get_gravity_centrality, {"r_radius": 3})
     if config["run_expensive_metrics"]["heat_kernel"]:
         DRI_FUNCTION_MAP["HeatKernel-API"] = (
-            spectral_tri.get_heat_kernel_api_tri,
+            spectral_dri.get_heat_kernel_api_dri,
             {"t_short": config["spectral_params"]["heat_kernel_t"]},
         )
 

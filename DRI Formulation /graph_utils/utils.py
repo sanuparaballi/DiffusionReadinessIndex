@@ -4,19 +4,18 @@
 Created on Mon Jun 16 20:39:08 2025
 
 @author: sanup
-"""
 
-
-# diffusion_readiness_project/graph_utils/utils.py
-# Python 3.9
-
-"""
 General utility functions for graph operations using NetworkX.
 These functions can be used by various modules for tasks like:
 - Extracting k-hop neighborhoods.
 - Getting induced subgraphs.
 - Other common graph manipulations or queries.
 """
+
+
+# diffusion_readiness_project/graph_utils/utils.py
+# Python 3.9
+
 
 import networkx as nx
 from collections import deque
@@ -97,6 +96,25 @@ def get_ego_network_minus_ego(graph, ego_node, radius=1):
     return get_k_hop_neighborhood_subgraph(graph, ego_node, k=radius, include_center=False)
 
 
+def get_graph_laplacian(graph, normalized=False):
+    """
+    Computes the Laplacian matrix of the graph.
+
+    Args:
+        graph (nx.Graph or nx.DiGraph): The input graph. For DiGraph, it's typically
+                                       the Laplacian of the underlying undirected graph.
+        normalized (bool): If True, computes the normalized Laplacian. Otherwise,
+                           computes the combinatorial Laplacian.
+
+    Returns:
+        scipy.sparse.csr_matrix: The Laplacian matrix.
+    """
+    if normalized:
+        return nx.normalized_laplacian_matrix(graph)
+    else:
+        return nx.laplacian_matrix(graph)
+
+
 # --- Main execution block (for testing this module independently) ---
 if __name__ == "__main__":
     print("Testing graph_utils.py...")
@@ -147,5 +165,15 @@ if __name__ == "__main__":
     print(f"\n{k_hops_dg}-hop neighborhood DiGraph around node {center_node_dg} (successors):")
     print(f"Nodes: {sorted(list(k_hop_sub_dg.nodes()))}")  # Expected: ['1', '2', '3']
     print(f"Edges: {list(k_hop_sub_dg.edges())}")  # Expected: [('1','2'), ('1','3'), ('2','3')]
+
+    # Test get_graph_laplacian
+    try:
+        laplacian = get_graph_laplacian(G_test_str)
+        print(f"\nLaplacian matrix (combinatorial) for G_test_str (shape: {laplacian.shape}):")
+        # print(laplacian.toarray()) # Can be large for big graphs
+        norm_laplacian = get_graph_laplacian(G_test_str, normalized=True)
+        print(f"Normalized Laplacian matrix for G_test_str (shape: {norm_laplacian.shape}):")
+    except Exception as e:
+        print(f"Could not compute Laplacian, ensure scipy is installed. Error: {e}")
 
     print("\n--- Graph Utils Test Complete ---")
