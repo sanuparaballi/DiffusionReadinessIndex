@@ -1,0 +1,43 @@
+ETM,DRI,Spearman_Correlation,P_value,F1@1%,F1@5%,F1@10%
+ADT,Degree (Out),1.0,0.0,1.0,1.0,1.0
+ADT,K-Core,0.0,1.0,1.0,0.6666666666666666,0.5
+ADT,Eigenvector,0.0,1.0,1.0,0.6666666666666666,0.5
+ADT,Closeness,-1.0,0.0,0.0,0.0,0.0
+ADT,CI (l=2),0.0,1.0,1.0,0.6666666666666666,0.5
+ADT,SD_ego (r=1),1.0,0.0,1.0,1.0,1.0
+ADT,FwLTR_struct,1.0,0.0,1.0,1.0,1.0
+ADT,BPI-DRI,1.0,0.0,1.0,1.0,1.0
+ADT,LocFiedler (k=1),1.0,0.0,1.0,1.0,1.0
+ADT,GlobFiedlerComp,0.0,1.0,1.0,0.6666666666666666,0.5
+ADT,LocSpecRadius (k=1),0.0,1.0,1.0,0.6666666666666666,0.5
+ADT,PPR-API,1.0,0.0,1.0,1.0,1.0
+ADT,WMFS_Simple,1.0,0.0,1.0,1.0,1.0
+ADT,WMFS_Advanced,1.0,0.0,1.0,1.0,1.0
+MCSS,Degree (Out),1.0,0.0,1.0,1.0,1.0
+MCSS,K-Core,0.0,1.0,1.0,0.6666666666666666,0.5
+MCSS,Eigenvector,0.0,1.0,1.0,0.6666666666666666,0.5
+MCSS,Closeness,-1.0,0.0,0.0,0.0,0.0
+MCSS,CI (l=2),0.0,1.0,1.0,0.6666666666666666,0.5
+MCSS,SD_ego (r=1),1.0,0.0,1.0,1.0,1.0
+MCSS,FwLTR_struct,1.0,0.0,1.0,1.0,1.0
+MCSS,BPI-DRI,1.0,0.0,1.0,1.0,1.0
+MCSS,LocFiedler (k=1),1.0,0.0,1.0,1.0,1.0
+MCSS,GlobFiedlerComp,0.0,1.0,1.0,0.6666666666666666,0.5
+MCSS,LocSpecRadius (k=1),0.0,1.0,1.0,0.6666666666666666,0.5
+MCSS,PPR-API,1.0,0.0,1.0,1.0,1.0
+MCSS,WMFS_Simple,1.0,0.0,1.0,1.0,1.0
+MCSS,WMFS_Advanced,1.0,0.0,1.0,1.0,1.0
+HNR_k,Degree (Out),1.0,0.0,1.0,1.0,1.0
+HNR_k,K-Core,0.0,1.0,1.0,0.6666666666666666,0.5
+HNR_k,Eigenvector,0.0,1.0,1.0,0.6666666666666666,0.5
+HNR_k,Closeness,-1.0,0.0,0.0,0.0,0.0
+HNR_k,CI (l=2),0.0,1.0,1.0,0.6666666666666666,0.5
+HNR_k,SD_ego (r=1),1.0,0.0,1.0,1.0,1.0
+HNR_k,FwLTR_struct,1.0,0.0,1.0,1.0,1.0
+HNR_k,BPI-DRI,1.0,0.0,1.0,1.0,1.0
+HNR_k,LocFiedler (k=1),1.0,0.0,1.0,1.0,1.0
+HNR_k,GlobFiedlerComp,0.0,1.0,1.0,0.6666666666666666,0.5
+HNR_k,LocSpecRadius (k=1),0.0,1.0,1.0,0.6666666666666666,0.5
+HNR_k,PPR-API,1.0,0.0,1.0,1.0,1.0
+HNR_k,WMFS_Simple,1.0,0.0,1.0,1.0,1.0
+HNR_k,WMFS_Advanced,1.0,0.0,1.0,1.0,1.0
